@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { RockPaperScissor, GameResults } from 'src/constants/enums';
-import { DataService } from 'src/services/data.service';
-import * as uuid from 'uuid';
+import { Component } from "@angular/core";
+import { RockPaperScissor, GameResults } from "src/constants/enums";
+import { DataService } from "src/services/data.service";
+import * as uuid from "uuid";
 
 type RoundResult = {
   userChoice: RockPaperScissor;
@@ -15,9 +15,9 @@ type UserPicks = {
 };
 
 @Component({
-  selector: 'rock-paper-scissor',
-  templateUrl: './rock-paper-scissor.component.html',
-  styleUrls: ['./rock-paper-scissor.component.css'],
+  selector: "rock-paper-scissor",
+  templateUrl: "./rock-paper-scissor.component.html",
+  styleUrls: ["./rock-paper-scissor.component.css"],
 })
 export class RockPaperScissorComponent {
   computerScore: number = 0;
@@ -28,19 +28,19 @@ export class RockPaperScissorComponent {
   userScore: number = 0;
   userPicks: UserPicks = { current: RockPaperScissor, previous: [] };
   buttons: RockPaperScissor[] = Object.values(RockPaperScissor);
-  userId: string = '';
+  userId: string = "";
   roundPlayTime: number = 0;
 
   constructor(private dataService: DataService) {}
 
-  ngOnInit() {
-    const userId = sessionStorage.getItem('userId');
+  async ngOnInit() {
+    const userId = sessionStorage.getItem("userId");
 
-    if (!userId) {
+    if (userId === null) {
       const newUserId = uuid.v4();
-      sessionStorage.setItem('userId', newUserId);
+      sessionStorage.setItem("userId", newUserId);
 
-      this.dataService.postUserResult({
+      await this.dataService.postUserResult({
         userId: newUserId,
         historicPicks: [],
         mostCommonPick: [],
@@ -95,7 +95,7 @@ export class RockPaperScissorComponent {
   determineWinner(
     userChoice: RockPaperScissor,
     computerChoice: string
-  ): RoundResult['result'] {
+  ): RoundResult["result"] {
     const userWon =
       (userChoice === RockPaperScissor.ROCK &&
         computerChoice === RockPaperScissor.SCISSORS) ||
@@ -123,10 +123,10 @@ export class RockPaperScissorComponent {
     }
   }
 
-  updateAnalytics(result: GameResults): void {
+  async updateAnalytics(result: GameResults): Promise<void> {
     const didUserWin = result === GameResults.USER_WIN;
 
-    this.dataService.updateUserResult(
+    await this.dataService.updateUserResult(
       {
         didUserWin,
         picks: this.userPicks.previous,

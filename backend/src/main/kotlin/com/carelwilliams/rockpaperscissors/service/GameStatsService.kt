@@ -27,7 +27,9 @@ class GameStatsService(private val dataSource: GameStatsDataSource) {
             newStats.totalLosses++
         }
 
-        val updatedWinLoseRatio = (newStats.totalWins.toDouble() / newStats.totalLosses.toDouble()).round(2)
+        val isInfinity = newStats.totalLosses == 0
+
+        val updatedWinLoseRatio = if(isInfinity) newStats.totalWins.toDouble() else (newStats.totalWins.toDouble() / newStats.totalLosses.toDouble()).round(2)
         val updatedTotalPlayTime = newStats.totalPlayTimeInS + payload.playTime
         val updatedHistoricPicks = payload.picks + newStats.historicPicks
         // Should not be included in public response
