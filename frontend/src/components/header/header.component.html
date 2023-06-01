@@ -1,0 +1,56 @@
+<div class="header-root-container">
+  <h1>Rock Paper Scissors</h1>
+  <p>Can you beat the computer?</p>
+  <a
+    *ngIf="data$?.mostCommonPick?.[0] !== undefined"
+    (click)="showStats()"
+    class="stats-icon"
+  >
+    <img [ngStyle]="{ maxWidth: '100%' }" src="assets/images/stats.png" />
+  </a>
+
+  <!-- Stats -->
+
+  <div *ngIf="isShowStats && data$" class="overlay">
+    <div class="stats-root-container">
+      <h1>Fun <span class="highlight"> stats </span>!</h1>
+      <h2>
+        Favorite
+        {{ data$.mostCommonPick.length > 1 ? "choices: " : "choice: " }}
+        <span class="highlight">
+          {{
+            data$.mostCommonPick.length > 1
+              ? data$.mostCommonPick.join(" / ")
+              : data$.mostCommonPick[0][0].toUpperCase() +
+                data$.mostCommonPick[0].slice(1).toLowerCase()
+          }}
+        </span>
+      </h2>
+      <h2>
+        Win/Lose ratio:
+        <span class="highlight">
+          {{ data$.winLoseRatio | number : "0.0-2" }}
+        </span>
+      </h2>
+      <h2>
+        Total minutes played:
+        <span class="highlight">
+          {{ data$.totalPlayTimeInS / 60 | number : "0.0-1" }}
+        </span>
+      </h2>
+      <h2>
+        Total losses:
+        <span class="highlight">
+          {{ data$.totalLosses }}
+        </span>
+      </h2>
+      <h2>
+        Total wins:
+        <span class="highlight">
+          {{ data$.totalWins }}
+        </span>
+      </h2>
+      <button (click)="showStats()">Close</button>
+    </div>
+  </div>
+</div>

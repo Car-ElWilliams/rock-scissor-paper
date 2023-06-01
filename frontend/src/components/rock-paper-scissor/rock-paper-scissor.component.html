@@ -1,0 +1,48 @@
+<game-header [userId]="userId" [showPopUp]="showPopUp" />
+<div class="root-container">
+  <div class="main-container">
+    <div class="score">
+      <h4>{{ computerScore }}</h4>
+    </div>
+    <div *ngIf="roundResult?.userChoice && roundResult?.computerChoice">
+      <h1>{{ roundResult?.result }}</h1>
+    </div>
+    <div class="score">
+      <h4>{{ userScore }}</h4>
+    </div>
+    <p class="you-text">(You)</p>
+  </div>
+</div>
+<hand-pick-svg
+  [hasStarted]="hasGameStarted"
+  [countdown]="countdown"
+  [computerChoice]="roundResult?.computerChoice"
+  [userChoice]="roundResult?.userChoice"
+/>
+<div class="choices">
+  <button
+    *ngFor="let button of buttons"
+    [disabled]="hasGameStarted"
+    (click)="play(button)"
+  >
+    {{ button.charAt(0).toUpperCase() + button.slice(1) }}
+  </button>
+</div>
+<div class="overlay" *ngIf="showPopUp">
+  <div class="popup-card">
+    <h1>Game Over!</h1>
+    <img
+      src="{{
+        userScore !== 3
+          ? '/assets/images/you_lose.jpg'
+          : '/assets/images/rock_paper_scissors.png'
+      }}"
+      class="pop-up-image"
+    />
+    <h3 class="you-win" *ngIf="userScore === 3">You win!</h3>
+    <p class="pop-up-card-score-paragraph">
+      {{ computerScore }} - {{ userScore }}
+    </p>
+    <button class="new-game" (click)="newGame()">New Game</button>
+  </div>
+</div>

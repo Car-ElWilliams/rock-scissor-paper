@@ -1,0 +1,105 @@
+.root-container {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+}
+
+.main-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.choices {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  margin: 5em 0;
+}
+
+.pop-up-image {
+  max-width: 55%;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.you-text {
+  position: absolute;
+  right: 0;
+  margin-right: 10px;
+  font-size: 1.2em;
+}
+
+h1 {
+  font-size: 3em;
+}
+
+button {
+  background-color: #e16049;
+  border-radius: 8px;
+  border-style: solid;
+  border-color: #ffded8;
+  border-width: 2px;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+  font-size: 1.5em;
+  font-weight: 500;
+  line-height: 20px;
+  margin: 0 0.8em;
+  outline: none;
+  padding: 0.8em 1.5em;
+  position: relative;
+}
+button:disabled {
+  opacity: 0.8;
+}
+
+.pop-up-card-score-paragraph {
+  font-size: 2.4em;
+  margin-top: -10px;
+}
+
+.result {
+  text-align: center;
+}
+
+.score {
+  font-size: 3em;
+  margin: 0 1.25em;
+}
+
+.you-win {
+  font-size: 2em;
+}
+
+/* Pop-up Card */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.popup-card h2 {
+  margin-bottom: 10px;
+}
+
+.popup-card button {
+  padding: 10px 20px;
+  font-size: 16px;
+}
