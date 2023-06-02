@@ -8,8 +8,8 @@ enum class RockPaperScissor(val pick: String) {
     ROCK("Rock"),
     PAPER("Paper"),
     SCISSOR("Scissor");
+}
 
-    private var value: String? = null
-
-
+enum class RequestType(val type: String) {
+    GET("Get"), POST("Post"), PUT("Put")
 }

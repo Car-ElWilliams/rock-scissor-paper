@@ -1,8 +1,8 @@
-import { RockPaperScissor } from 'src/constants/enums';
+import { RockPaperScissor } from "src/constants/enums";
 
 export interface ResultBody {
   mostCommonPick: RockPaperScissor[];
-  winLoseRatio: number;
+  winPercentage: number;
   totalWins: number;
   historicPicks: RockPaperScissor[];
   totalLosses: number;
@@ -14,4 +14,7 @@ export interface UpdateResultBody {
   didUserWin: boolean;
   picks: RockPaperScissor[];
   playTime: number;
+}
+export interface PostResultBody extends UpdateResultBody {
+  userId: string;
 }

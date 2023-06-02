@@ -2,6 +2,7 @@ package com.carelwilliams.rockpaperscissors.controller
 
 import com.carelwilliams.rockpaperscissors.model.GameStats
 import com.carelwilliams.rockpaperscissors.model.UpdateGameStats
+import com.carelwilliams.rockpaperscissors.model.PostGameStats
 import com.carelwilliams.rockpaperscissors.service.GameStatsService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -38,7 +39,7 @@ class StatsController(private val service: GameStatsService) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun postStats(@RequestBody payload: GameStats): GameStats = service.postStats(payload)
+    fun postStats(@RequestBody payload: PostGameStats): GameStats = service.postStats(payload)
 
     @PutMapping("/{userId}")
     @ResponseStatus(HttpStatus.CREATED)

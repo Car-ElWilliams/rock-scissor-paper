@@ -7,7 +7,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
   </head>
-  <body>
+  <body
+    style="
+      overflow-x: hidden;
+      background-size: cover;
+      display: table;
+      width: 100%;
+      background-position: center top;
+    "
+  >
     <app-root></app-root>
   </body>
 </html>
+<script>
+  const randomBackgroundImg = () => {
+    const randomImage = new Array();
+
+    randomImage[0] = "./assets/images/cloud99.jpg";
+    randomImage[1] = "./assets/images/milky.jpg";
+    randomImage[2] = "./assets/images/speicherstadt.jpg";
+    randomImage[3] = "./assets/images/rome.jpg";
+
+    const number = Math.floor(Math.random() * randomImage.length);
+
+    return randomImage[number];
+  };
+
+  document.body.style.backgroundImage =
+    "linear-gradient( rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35) ) ,url('" +
+    randomBackgroundImg() +
+    "')";
+</script>

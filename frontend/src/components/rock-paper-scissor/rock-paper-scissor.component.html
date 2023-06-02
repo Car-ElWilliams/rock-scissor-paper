@@ -1,20 +1,22 @@
 <game-header [userId]="userId" [showPopUp]="showPopUp" />
-<div class="root-container">
-  <div class="main-container">
-    <div class="score">
-      <h4>{{ computerScore }}</h4>
-    </div>
-    <div *ngIf="roundResult?.userChoice && roundResult?.computerChoice">
-      <h1>{{ roundResult?.result }}</h1>
-    </div>
-    <div class="score">
-      <h4>{{ userScore }}</h4>
-    </div>
-    <p class="you-text">(You)</p>
+
+<div class="main-container">
+  <div class="score">
+    <h4>{{ computerScore }}</h4>
   </div>
+  <div *ngIf="roundResult?.userChoice && roundResult?.computerChoice">
+    <h1>
+      {{ roundResult?.result }}
+    </h1>
+  </div>
+  <div class="score" style="left: -0.9em; position: relative">
+    <h4>{{ userScore }}</h4>
+  </div>
+  <p class="you-text">(You)</p>
 </div>
+
 <hand-pick-svg
-  [hasStarted]="hasGameStarted"
+  [hasStarted]="hasRoundStarted"
   [countdown]="countdown"
   [computerChoice]="roundResult?.computerChoice"
   [userChoice]="roundResult?.userChoice"
@@ -22,7 +24,7 @@
 <div class="choices">
   <button
     *ngFor="let button of buttons"
-    [disabled]="hasGameStarted"
+    [disabled]="hasRoundStarted"
     (click)="play(button)"
   >
     {{ button.charAt(0).toUpperCase() + button.slice(1) }}

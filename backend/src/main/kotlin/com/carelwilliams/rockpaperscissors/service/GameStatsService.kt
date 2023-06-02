@@ -1,46 +1,47 @@
 package com.carelwilliams.rockpaperscissors.service
 
 import com.carelwilliams.rockpaperscissors.datasource.GameStatsDataSource
+import com.carelwilliams.rockpaperscissors.enums.RequestType
 import com.carelwilliams.rockpaperscissors.enums.RockPaperScissor
 import com.carelwilliams.rockpaperscissors.model.GameStats
+import com.carelwilliams.rockpaperscissors.model.PublicRequestKeys
+import com.carelwilliams.rockpaperscissors.model.PostGameStats
 import com.carelwilliams.rockpaperscissors.model.UpdateGameStats
-import org.springframework.stereotype.Service
 import kotlin.math.round
+import org.springframework.stereotype.Service
 
 @Service
 class GameStatsService(private val dataSource: GameStatsDataSource) {
 
     fun getAllStats(): MutableList<GameStats> = dataSource.getAllStats()
 
-    fun getUserStats(userId: String): GameStats {
-        return dataSource.getUserStats(userId)
+    fun getUserStats(userId: String): GameStats = dataSource.getUserStats(userId)
+
+    fun postStats(payload: PostGameStats): GameStats {
+        val adjustedPayload: PublicRequestKeys =
+            PublicRequestKeys(
+                payload.userId,
+                payload.didUserWin,
+                payload.picks,
+                payload.playTime
+            )
+
+        val result = addInternalKeys(adjustedPayload, RequestType.POST, null)
+
+        return dataSource.postStats(result)
     }
 
-    fun postStats(payload: GameStats): GameStats = dataSource.postStats(payload)
-
     fun updateStats(payload: UpdateGameStats, userId: String): GameStats {
-        val newStats = dataSource.getUserStats(userId)
+        val previousStats = dataSource.getUserStats(userId)
+        val adjustedPayload: PublicRequestKeys =
+            PublicRequestKeys(
+                userId,
+                payload.didUserWin,
+                payload.picks,
+                payload.playTime
+            )
 
-        if (payload.didUserWin) {
-            newStats.totalWins++
-        } else {
-            newStats.totalLosses++
-        }
-
-        val isInfinity = newStats.totalLosses == 0
-
-        val updatedWinLoseRatio = if(isInfinity) newStats.totalWins.toDouble() else (newStats.totalWins.toDouble() / newStats.totalLosses.toDouble()).round(2)
-        val updatedTotalPlayTime = newStats.totalPlayTimeInS + payload.playTime
-        val updatedHistoricPicks = payload.picks + newStats.historicPicks
-        // Should not be included in public response
-        val updatedMostCommonPick = findMostCommonPick(updatedHistoricPicks)
-
-        newStats.winLoseRatio = updatedWinLoseRatio
-        newStats.totalPlayTimeInS = updatedTotalPlayTime
-        newStats.historicPicks = updatedHistoricPicks
-        newStats.mostCommonPick = updatedMostCommonPick
-
-        return newStats
+        return addInternalKeys(adjustedPayload, RequestType.PUT, previousStats)
     }
 }
 
@@ -56,4 +57,34 @@ fun findMostCommonPick(array: List<RockPaperScissor>): List<RockPaperScissor> {
     val maxOccurrences = stringOccurrences.values.maxOrNull()
 
     return stringOccurrences.filterValues { it == maxOccurrences }.keys.toList()
+}
+
+fun addInternalKeys(
+    body: PublicRequestKeys,
+    request: RequestType,
+    previousGameStats: GameStats?
+): GameStats {
+    var result = GameStats(body.userId, listOf(), 0.0, 0, 0, 0, listOf())
+
+    if (request == RequestType.PUT && previousGameStats !== null) {
+        result = previousGameStats
+    }
+
+    if (body.didUserWin) result.totalWins++ else result.totalLosses++
+
+    val isInfinity = result.totalLosses == 0
+    val winPercentage =
+        if (isInfinity) 100.0
+        else (result.totalWins.toDouble() / (result.totalLosses + result.totalWins) * 100)
+
+    val totalPlayTime = result.totalPlayTimeInS + body.playTime
+    val historicPicks = body.picks + result.historicPicks
+    val mostCommonPick = findMostCommonPick(historicPicks)
+
+    result.winPercentage = winPercentage
+    result.totalPlayTimeInS = totalPlayTime
+    result.historicPicks = historicPicks
+    result.mostCommonPick = mostCommonPick
+
+    return result
 }

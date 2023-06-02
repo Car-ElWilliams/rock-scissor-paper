@@ -1,0 +1,12 @@
+{
+  "name": "rock-scissor-paper",
+  "version": "1.0.0",
+  "description": "Rock paper scissor game with a spring boot backend and an angular frontend",
+  "main": "index.js",
+  "scripts": {
+    "backend": "bash -c \"source scripts.sh; startBackend\"",
+    "frontend": "bash -c \"source scripts.sh; startFrontend\""
+  },
+  "author": "",
+  "license": "ISC"
+}

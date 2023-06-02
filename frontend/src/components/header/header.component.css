@@ -1,7 +1,16 @@
+p,
+h1 {
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
 .header-root-container {
   text-align: center;
   flex: 1;
   margin-top: 2em;
+}
+
+.header {
+  color: #fff2f0;
 }
 
 .stats-root-container {

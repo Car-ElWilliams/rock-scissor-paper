@@ -1,13 +1,15 @@
 <div class="header-root-container">
-  <h1>Rock Paper Scissors</h1>
-  <p>Can you beat the computer?</p>
-  <a
-    *ngIf="(data$?.totalPlayTimeInS ?? 0) > 0"
-    (click)="showStats()"
-    class="stats-icon"
-  >
-    <img [ngStyle]="{ maxWidth: '100%' }" src="assets/images/stats.png" />
-  </a>
+  <div class="header">
+    <h1>Rock Paper Scissors</h1>
+    <p>Whoever wins 3 rounds wins the game. Can you beat the computer?</p>
+    <a
+      *ngIf="(data$?.totalPlayTimeInS ?? 0) > 0"
+      (click)="showStats()"
+      class="stats-icon"
+    >
+      <img [ngStyle]="{ maxWidth: '100%' }" src="assets/images/stats.png" />
+    </a>
+  </div>
 
   <!-- Stats -->
 
@@ -27,9 +29,9 @@
         </span>
       </h2>
       <h2>
-        Win/Lose ratio:
+        Win percentage:
         <span class="highlight">
-          {{ data$.winLoseRatio | number : "0.0-2" }}
+          {{ data$.winPercentage | number : "0.0-2" }} %
         </span>
       </h2>
       <h2>

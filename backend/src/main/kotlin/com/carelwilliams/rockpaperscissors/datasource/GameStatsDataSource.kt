@@ -6,4 +6,5 @@ interface GameStatsDataSource {
     fun getAllStats(): MutableList<GameStats>
     fun getUserStats(userId: String): GameStats
     fun postStats(newStats: GameStats): GameStats
+
 }

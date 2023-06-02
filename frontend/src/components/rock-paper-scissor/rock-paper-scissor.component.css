@@ -1,20 +1,16 @@
-.root-container {
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-}
-
 .main-container {
   display: flex;
+  height: 9em;
   justify-content: space-between;
   align-items: center;
+  color: #fff4f4;
 }
 
 .choices {
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
-  margin: 5em 0;
+  margin-top: 5em;
 }
 
 .pop-up-image {
@@ -26,8 +22,9 @@
 .you-text {
   position: absolute;
   right: 0;
-  margin-right: 10px;
-  font-size: 1.2em;
+  margin-top: 12px;
+  margin-right: 2.1em;
+  font-size: 1.3em;
 }
 
 h1 {
@@ -68,7 +65,7 @@ button:disabled {
 
 .score {
   font-size: 3em;
-  margin: 0 1.25em;
+  margin: 0 1.5em;
 }
 
 .you-win {

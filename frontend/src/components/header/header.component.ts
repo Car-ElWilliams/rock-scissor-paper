@@ -1,23 +1,23 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { DataService } from 'src/services/data.service';
-import { ResultBody } from 'src/schemas/schemas';
+import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { DataService } from "src/services/data.service";
+import { ResultBody } from "src/schemas/schemas";
 
 @Component({
-  selector: 'game-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css'],
+  selector: "game-header",
+  templateUrl: "./header.component.html",
+  styleUrls: ["./header.component.css"],
 })
 export class HeaderComponent implements OnChanges {
   @Input() userId?: string;
   @Input() showPopUp: boolean = false;
 
   isShowStats: boolean = false;
-  data$: Omit<ResultBody, 'historicPicks' | 'userId'> | undefined = undefined;
+  data$: Omit<ResultBody, "historicPicks" | "userId"> | undefined = undefined;
 
   constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
-    const userId = sessionStorage.getItem('userId');
+    const userId = localStorage.getItem("userId");
 
     if (userId) {
       this.fetchStats(userId);
@@ -25,7 +25,7 @@ export class HeaderComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['showPopUp'] && this.userId) {
+    if (changes["showPopUp"] && this.userId) {
       this.fetchStats(this.userId);
     }
   }
