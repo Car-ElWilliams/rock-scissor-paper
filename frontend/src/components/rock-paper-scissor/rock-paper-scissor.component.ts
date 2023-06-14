@@ -11,8 +11,8 @@ type RoundResult = {
 };
 
 type UserPicks = {
-  current: typeof RockPaperScissor;
-  previous: RockPaperScissor[];
+  current: RockPaperScissor | null;
+  previous: RockPaperScissor[] | null;
 };
 
 @Component({
@@ -27,18 +27,22 @@ export class RockPaperScissorComponent {
   roundResult: RoundResult | null = null;
   showPopUp: boolean = false;
   userScore: number = 0;
-  userPicks: UserPicks = { current: RockPaperScissor, previous: [] };
+  userPicks: UserPicks = {
+    current: null,
+    previous: [],
+  };
   buttons: RockPaperScissor[] = Object.values(RockPaperScissor);
   userId: string = "";
   elapsedPlayTime: number = 0;
   isServerConnection: boolean = false;
+  hasGameEnded: boolean | null = null;
 
   constructor(
     private dataService: DataService,
     private toastr: ToastrService
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.checkConnectionToServer();
 
     const userId = localStorage.getItem("userId");
@@ -50,33 +54,50 @@ export class RockPaperScissorComponent {
       this.userId = newUserId;
     } else {
       this.userId = userId;
+      const gameSession = await this.getGameSession(userId);
+
+      if (gameSession) {
+        this.userScore = gameSession.userScore;
+        this.computerScore = gameSession.computerScore;
+        this.userScore = gameSession.userScore;
+        this.hasGameEnded = gameSession.hasGameEnded;
+      }
     }
   }
 
   async checkConnectionToServer() {
-    const result = await this.dataService.isConnectedToServer();
+    const connection = await this.dataService.isConnectedToServer();
 
-    if (!result) {
-      this.showError();
+    if (!connection) {
+      this.showError(
+        "Failed to connect to server. No new games can be started",
+        "SERVER ERROR"
+      );
     }
   }
 
-  showError() {
-    this.toastr.error(
-      "Failed to connect to server, stats will not be saved",
-      "SERVER ERROR",
-      {
-        disableTimeOut: true,
-      }
-    );
+  showError(message: string, title: string) {
+    this.toastr.error(message, title, {
+      disableTimeOut: true,
+    });
   }
 
-  play(userChoice: RockPaperScissor): void {
+  async play(userChoice: RockPaperScissor) {
     this.roundResult = null;
     this.hasRoundStarted = true;
 
-    const choices = Object.values(RockPaperScissor);
-    const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+    const isGameSession = await this.dataService.getUserGameSession(
+      this.userId
+    );
+
+    const result = isGameSession
+      ? await this.updateGameSession(userChoice)
+      : await this.startNewGameSession(userChoice);
+
+    if (!result) {
+      this.showError("ERROR", "Failed to get response from server");
+      throw new Error("Failed to get api response");
+    }
 
     if (this.elapsedPlayTime === 0) {
       const stopWatch = setInterval(() => {
@@ -91,60 +112,42 @@ export class RockPaperScissorComponent {
       if (this.countdown === 0) {
         clearInterval(countdown);
 
-        const result = this.determineWinner(userChoice, computerChoice);
-        this.updateScore(result);
+        const {
+          userScore,
+          computerChoice,
+          computerScore,
+          hasGameEnded,
+          roundResult,
+        } = result;
 
-        this.userPicks.previous.push(userChoice);
-        this.roundResult = { computerChoice, userChoice, result };
+        this.userScore = userScore;
+        this.computerScore = computerScore;
+        this.roundResult = {
+          computerChoice: computerChoice,
+          userChoice,
+          result: roundResult,
+        };
+
+        this.userPicks.previous && this.userPicks.previous.push(userChoice);
         this.countdown = 3;
         this.hasRoundStarted = false;
-
-        const hasGameEnded = this.userScore === 3 || this.computerScore === 3;
+        this.hasGameEnded = hasGameEnded;
 
         if (hasGameEnded) {
-          this.handleGameResults(result);
+          this.handleGameResults(roundResult);
 
           setTimeout(() => {
             this.showPopUp = true;
-          }, 500);
+          }, 250);
         }
       }
     }, 1000);
   }
 
-  determineWinner(
-    userChoice: RockPaperScissor,
-    computerChoice: string
-  ): RoundResult["result"] {
-    const userWon =
-      (userChoice === RockPaperScissor.ROCK &&
-        computerChoice === RockPaperScissor.SCISSORS) ||
-      (userChoice === RockPaperScissor.PAPER &&
-        computerChoice === RockPaperScissor.ROCK) ||
-      (userChoice === RockPaperScissor.SCISSORS &&
-        computerChoice === RockPaperScissor.PAPER);
-
-    const tie = userChoice === computerChoice;
-
-    if (tie) {
-      return GameResults.TIE;
-    } else if (userWon) {
-      return GameResults.USER_WIN;
-    } else {
-      return GameResults.COMPUTER_WIN;
-    }
-  }
-
-  updateScore(result: GameResults): void {
-    if (result === GameResults.USER_WIN) {
-      this.userScore++;
-    } else if (result === GameResults.COMPUTER_WIN) {
-      this.computerScore++;
-    }
-  }
-
   async handleGameResults(result: GameResults): Promise<void> {
     const userEntryExists = await this.dataService.getUserResult(this.userId);
+
+    console.log(userEntryExists);
 
     if (userEntryExists) {
       await this.updateUserStats(result);
@@ -159,7 +162,7 @@ export class RockPaperScissorComponent {
     await this.dataService.updateUserResult(
       {
         didUserWin,
-        picks: this.userPicks.previous,
+        picks: this.userPicks.previous ?? [],
         playTime: this.elapsedPlayTime,
       },
       this.userId
@@ -173,17 +176,32 @@ export class RockPaperScissorComponent {
       userId: this.userId,
       didUserWin: userWon,
       playTime: this.elapsedPlayTime,
-      picks: this.userPicks.previous,
+      picks: this.userPicks.previous ?? [],
     });
   }
 
+  async startNewGameSession(userChoice: RockPaperScissor) {
+    return await this.dataService.startNewGameSession({
+      userChoice,
+      userId: this.userId,
+    });
+  }
+
+  async updateGameSession(userChoice: RockPaperScissor) {
+    return await this.dataService.updateGameSession(
+      { userChoice },
+      this.userId
+    );
+  }
+
+  async getGameSession(userId: string) {
+    return await this.dataService.getUserGameSession(userId);
+  }
+
   newGame(): void {
-    this.userScore = 0;
-    this.computerScore = 0;
     this.countdown = 3;
     this.showPopUp = false;
     this.userPicks.previous = [];
-    this.roundResult = null;
     this.elapsedPlayTime = 0;
   }
 }

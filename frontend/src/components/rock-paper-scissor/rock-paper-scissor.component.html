@@ -2,15 +2,19 @@
 
 <div class="main-container">
   <div class="score">
-    <h4>{{ computerScore }}</h4>
+    <h4>{{ hasGameEnded ? 0 : computerScore }}</h4>
   </div>
-  <div *ngIf="roundResult?.userChoice && roundResult?.computerChoice">
+  <div
+    *ngIf="
+      !hasGameEnded && roundResult?.userChoice && roundResult?.computerChoice
+    "
+  >
     <h1>
       {{ roundResult?.result }}
     </h1>
   </div>
   <div class="score" style="left: -0.9em; position: relative">
-    <h4>{{ userScore }}</h4>
+    <h4>{{ hasGameEnded ? 0 : userScore }}</h4>
   </div>
   <p class="you-text">(You)</p>
 </div>

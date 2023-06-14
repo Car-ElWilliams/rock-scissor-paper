@@ -31,3 +31,18 @@ class PublicRequestKeys(
     val picks: List<RockPaperScissor>,
     val playTime: Int,
 )
+
+// -* Game Play Session *- //
+class GamePlaySession(
+    val userId: String,
+    var roundResult: String?,
+    var userScore: Int,
+    var computerScore: Int,
+    var hasGameEnded: Boolean,
+    var computerChoice: RockPaperScissor?
+)
+
+class UpdateGamePlaySession(val userChoice: RockPaperScissor)
+class PostGamePlaySession(val userId: String, val userChoice: RockPaperScissor)
+class GetGamePlaySession(val userId: String)
+

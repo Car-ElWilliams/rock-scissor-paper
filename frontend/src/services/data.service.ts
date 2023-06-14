@@ -1,7 +1,10 @@
 import { Injectable } from "@angular/core";
 import {
+  GameSessionResponse,
+  PostGameSessionBody,
   PostResultBody,
   ResultBody,
+  UpdateGameSessionBody,
   UpdateResultBody,
 } from "src/schemas/schemas";
 
@@ -20,15 +23,74 @@ export class DataService {
     }
   }
 
+  async getUserGameSession(
+    userId: string
+  ): Promise<GameSessionResponse | undefined> {
+    try {
+      const result = await fetch(
+        `http://localhost:8000/api/session/${userId}`
+      ).then((val) => val?.json());
+
+      return result;
+    } catch (error) {
+      console.error("API-Error - getUserGameSession: ", error);
+      return;
+    }
+  }
+
+  async updateGameSession(
+    body: UpdateGameSessionBody,
+    userId: string
+  ): Promise<GameSessionResponse | undefined> {
+    try {
+      const result = await fetch(
+        `http://localhost:8000/api/session/${userId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        }
+      ).then((val) => val.json());
+
+      return result;
+    } catch (error) {
+      console.error("API-Error - startNewGameSession: ", error);
+      return;
+    }
+  }
+
+  async startNewGameSession(
+    body: PostGameSessionBody
+  ): Promise<GameSessionResponse | undefined> {
+    try {
+      const result = fetch("http://localhost:8000/api/session", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      }).then((val) => val.json());
+
+      return result;
+    } catch (error) {
+      console.error("API-Error - startNewGameSession: ", error);
+      return;
+    }
+  }
+
   postNewUser(body: PostResultBody) {
     try {
-      return fetch("http://localhost:8000/api/stats", {
+      const result = fetch("http://localhost:8000/api/stats", {
         method: "POST",
         body: JSON.stringify(body),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
         },
       });
+
+      return result;
     } catch (error) {
       console.error("API-Error - postNewUser: ", error);
 

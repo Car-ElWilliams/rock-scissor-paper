@@ -18,7 +18,7 @@ class GameStatsService(private val dataSource: GameStatsDataSource) {
     fun getUserStats(userId: String): GameStats = dataSource.getUserStats(userId)
 
     fun postStats(payload: PostGameStats): GameStats {
-        val adjustedPayload: PublicRequestKeys =
+        val adjustedPayload =
             PublicRequestKeys(
                 payload.userId,
                 payload.didUserWin,
@@ -33,7 +33,7 @@ class GameStatsService(private val dataSource: GameStatsDataSource) {
 
     fun updateStats(payload: UpdateGameStats, userId: String): GameStats {
         val previousStats = dataSource.getUserStats(userId)
-        val adjustedPayload: PublicRequestKeys =
+        val adjustedPayload =
             PublicRequestKeys(
                 userId,
                 payload.didUserWin,
@@ -45,19 +45,6 @@ class GameStatsService(private val dataSource: GameStatsDataSource) {
     }
 }
 
-fun Double.round(decimals: Int): Double {
-    var multiplier = 1.0
-    repeat(decimals) { multiplier *= 10 }
-
-    return round(this * multiplier) / multiplier
-}
-
-fun findMostCommonPick(array: List<RockPaperScissor>): List<RockPaperScissor> {
-    val stringOccurrences = array.groupingBy { it }.eachCount()
-    val maxOccurrences = stringOccurrences.values.maxOrNull()
-
-    return stringOccurrences.filterValues { it == maxOccurrences }.keys.toList()
-}
 
 fun addInternalKeys(
     body: PublicRequestKeys,
@@ -87,4 +74,11 @@ fun addInternalKeys(
     result.mostCommonPick = mostCommonPick
 
     return result
+}
+
+fun findMostCommonPick(array: List<RockPaperScissor>): List<RockPaperScissor> {
+    val stringOccurrences = array.groupingBy { it }.eachCount()
+    val maxOccurrences = stringOccurrences.values.maxOrNull()
+
+    return stringOccurrences.filterValues { it == maxOccurrences }.keys.toList()
 }
